@@ -2,12 +2,22 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\System\HealthCheckController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
+/**
+ * Class RouteServiceProvider
+ *
+ * @package  App\Providers
+ * @Author   : paul
+ * @DateTime : 2025/3/6 18:10
+ */
 class RouteServiceProvider extends ServiceProvider
 {
     /**
@@ -17,7 +27,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/home';
+    public const HOME = '/';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
@@ -28,13 +38,42 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        $this->routes(function () {
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(base_path('routes/api.php'));
-
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
+        // 拆分路由檔
+        collect(config('route.domains'))->each(function ($config, $name) {
+            // 設定 Route Map
+            Route::domain(Arr::get($config, 'domain'))
+                ->name(Arr::get($config, 'name', $name) . '.')
+                ->middleware(Arr::get($config, 'middleware', $name))
+                ->namespace($this->getNamespace(Arr::get($config, 'namespace', "\\" . Str::ucfirst(Str::camel($name)))))
+                ->prefix(Arr::get($config, 'prefix', '/'))
+                ->group($this->getGroupFile(Arr::get($config, 'file')));
         });
+
+        // 系統健康檢查
+        Route::get('/health-check', [HealthCheckController::class, 'check']);
+    }
+
+    /**
+     * @param string $namespace
+     *
+     * @return string
+     * @Author   : paul
+     * @DateTime : 2025/3/6 18:10
+     */
+    private function getNamespace(string $namespace): string
+    {
+        return str_replace('\\\\', '\\', 'App\Http\Controllers' . '\\' . $namespace);
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return string
+     * @Author   : paul
+     * @DateTime : 2025/3/6 18:10
+     */
+    private function getGroupFile(string $file): string
+    {
+        return base_path('routes/' . $file);
     }
 }
