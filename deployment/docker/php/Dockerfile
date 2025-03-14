@@ -12,7 +12,7 @@ RUN apt-get update && \
         python3 python3-pip procps cron sysstat \
         vim iftop htop iotop lsof git gcc make screen g++ \
         imagemagick zip wget curl zsh ntpdate supervisor \
-        libgeoip-dev && \
+        libgeoip-dev libicu-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -25,7 +25,7 @@ RUN apt-get update && \
         php8.2-pspell php8.2-mysql php8.2-snmp php8.2-pdo php8.2-ldap \
         php8.2-gd php8.2-bcmath php8.2-enchant php8.2-mbstring php8.2-xml \
         php8.2-cli php8.2-common php8.2-soap php8.2-zip php8.2-igbinary \
-        php8.2-memcache php8.2-memcached php8.2-redis php-pear && \
+        php8.2-memcache php8.2-memcached php8.2-redis php-pear php8.2-intl && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
