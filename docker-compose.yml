@@ -23,6 +23,7 @@ services:
     volumes:
       - ./deployment/docker/nginx/conf.d:/etc/nginx/conf.d
       - ./deployment/docker/nginx/sslkey:/etc/nginx/sslkey
+      - ./laravel-app:/var/www/html
     ports:
       - "80:80"
       - "443:443"
