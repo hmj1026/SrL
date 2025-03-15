@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Controllers\System\HealthCheckController;
+use Filament\Facades\Filament;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -51,6 +52,11 @@ class RouteServiceProvider extends ServiceProvider
 
         // 系統健康檢查
         Route::get('/health-check', [HealthCheckController::class, 'check']);
+
+        // 調整livewire使用設定好的middleware group而不是走預設的web
+        app(\Livewire\Mechanisms\HandleRequests\HandleRequests::class)->setUpdateRoute(function ($handle) {
+            return Route::post('/livewire/update', $handle)->middleware(Filament::getAuthGuard());
+        });
     }
 
     /**
