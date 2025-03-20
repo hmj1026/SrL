@@ -29,6 +29,13 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
+# 安裝 Node.js 和 npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    npm install -g npm && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # 自動同步時區
 RUN cp -rf /etc/localtime /etc/localtime.orig && \
     cp -rf /usr/share/zoneinfo/Asia/Taipei /etc/localtime && \
